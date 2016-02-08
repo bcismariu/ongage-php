@@ -1,0 +1,22 @@
+{
+    "name": "bcismariu/ongage-php",
+    "description": "Simple PHP wrapper for Ongage API",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "guzzlehttp/guzzle": "~6.0"
+    },
+    "authors": [
+        {
+            "name": "Bogdan Cismariu",
+            "email": "bogdan.cismariu@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+    	"psr-4": {
+    		"Bcismariu\\Ongage\\": "src/"
+    	}
+    }
+}
+
