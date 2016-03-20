@@ -21,6 +21,21 @@ class Ongage
 	 */
 	protected $client;
 
+	/**
+	 * property to API class maps
+	 * @var [type]
+	 */
+	protected $mappings = [
+		'contacts'	=>	'Api\Contacts',
+		'reports'	=>	'Api\Reports',
+	];
+
+	/**
+	 * stores Api instances for singleton behaviour
+	 * @var array
+	 */
+	protected $instances = [];
+
 	public function __construct($username = null, $password = null, $account_code = null)
 	{
 		$this->auth = [
@@ -30,6 +45,35 @@ class Ongage
 		];
 		$this->client = new GuzzleHttp\Client();
 	}
+
+	/**
+	 * magic loading of API module
+	 * @param  string $property see mappings
+	 * @return instance of api module
+	 */
+	public function __get($property)
+	{
+		if (!array_key_exists($property, $this->mappings)) {
+			throw new OngageException("Unknown API module: $property");
+		}
+		return $this->getInstance($property);
+	}
+
+	/**
+	 * get a singleton instance for the required module
+	 * @param  string $property see mappings
+	 * @return instance of api module
+	 */
+	protected function getInstance($property)
+	{
+		if (isset($this->instances[$property])) {
+			return $this->instances[$property];
+		}
+		$module = __NAMESPACE__ . '\\' . $this->mappings[$property];
+		$this->instances[$property] = new $module($this);
+		return $this->instances[$property];
+	}
+
 
 	public function useList($list_id) 
 	{
