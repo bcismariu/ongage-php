@@ -1,7 +1,7 @@
 <?php
 
 namespace Bcismariu\Ongage;
-
+require dirname(__DIR__) . '/vendor/autoload.php';
 use GuzzleHttp;
 
 class Ongage
@@ -14,7 +14,7 @@ class Ongage
 
 	protected $base_uri = 'https://api.ongage.net/api/';
 
-	protected $list_id;
+	public $list_id;
 
 	/**
 	 * Http Client
@@ -74,84 +74,68 @@ class Ongage
 		return $this->instances[$property];
 	}
 
-
-	public function useList($list_id) 
+	/**
+	 * set current list id
+	 * @param $list_id the list id
+	 * @return mixed
+	 */
+	public function useList($list_id)
 	{
 		$this->list_id = $list_id;
-		return $this;
+		return $this->list_id;
 	}
 
-	public function addContact($contact_data)
+	/**
+	 * this method is called from each api component
+	 * @param $method method type(POST, GET, PUT)
+	 * @param $url ongage package method url
+	 * @param $data data array
+	 * @return mixed
+	 */
+	public function call($method, $url, $data)
 	{
-		$contact_data = $this->setListId($contact_data);
-		if (!isset($contact_data['email'])) {
-			throw new OngageException('No email found for contact');
-		}
-		$post_data = [
-			'email' => $contact_data['email'],
-			'list_id' => $contact_data['list_id'],
-			'overwrite'	=> true,
-			'fields' => $contact_data
-		];
-		return $this->json('POST', 'v2/contacts', $post_data);
+		return $this->json($method, $url, $data);
 	}
 
-	public function findEmail($email)
-	{
-		$data = [
-			'user_type'	=> 'active',
-			'offset'	=> 0,
-			'list_id'	=> 0,
-			'limit'		=> 20,
-			'sort'		=> [
-					'field'	=> 'name',
-					'order'	=> 'asc'
-				],
-			'criteria'	=> [[
-				'field_name'	=> 'email',
-				'type'			=> 'email',
-				'operator'		=> 'LIKE',
-				'operand'		=> [$email],
-				'case_sensitive'	=> 0,
-				'condition'		=> 'and'
-			]]
-		];
-		return $this->json('post', 'contacts/lookup', $data);
-	}
-
+	/**
+	 * decode the json response from ongage server
+	 * @param $method method type(POST, GET, PUT)
+	 * @param $url ongage package method url
+	 * @param $data data array
+	 * @return mixed
+	 */
 	private function json($method, $url, $data)
 	{
 		$response = $this->request($method, $url, $data);
 		return json_decode($response->getBody()->getContents());
 	}
 
+	/**
+	 * make the request to ongage server
+	 * @param $method method type(POST, GET, PUT)
+	 * @param $url ongage package method url
+	 * @param $data data array
+	 * @return mixed|\Psr\Http\Message\ResponseInterface
+	 */
 	private function request($method, $url, $data)
 	{
 		return $this->client->request($method, $url, [
 				'base_uri'	=> $this->base_uri,
 				'headers' 	=> $this->getAuthHeaders(),
-				'json'		=> $data,
+				'json'		=> $data
 			]);
 	}
 
+	/**
+	 * set authentification headers
+	 * @return array
+	 */
 	private function getAuthHeaders()
 	{
 		return [
 			'X_USERNAME' 		=> $this->auth['username'],
 			'X_PASSWORD'		=> $this->auth['password'],
-			'X_ACCOUNT_CODE'	=> $this->auth['account_code'],
+			'X_ACCOUNT_CODE'	=> $this->auth['account_code']
 		];
-	}
-
-	private function setListId($data)
-	{
-		if (isset($data['list_id'])) {
-			return $data;
-		}
-		if (isset($this->list_id)) {
-			$data['list_id'] = $this->list_id;
-			return $data;
-		}
-		throw new OngageException('No list id found');
 	}
 }
