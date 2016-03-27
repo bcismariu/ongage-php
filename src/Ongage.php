@@ -1,7 +1,6 @@
 <?php
 
 namespace Bcismariu\Ongage;
-require dirname(__DIR__) . '/vendor/autoload.php';
 use GuzzleHttp;
 
 class Ongage
@@ -14,7 +13,7 @@ class Ongage
 
 	protected $base_uri = 'https://api.ongage.net/api/';
 
-	public $list_id;
+	protected $list_id;
 
 	/**
 	 * Http Client
@@ -120,10 +119,22 @@ class Ongage
 	private function request($method, $url, $data)
 	{
 		return $this->client->request($method, $url, [
-				'base_uri'	=> $this->base_uri,
+				'base_uri'	=> $this->setUri(),
 				'headers' 	=> $this->getAuthHeaders(),
 				'json'		=> $data
 			]);
+	}
+
+	/**
+	 * puts the list id in the request uri
+	 * @return string
+	 */
+	private function setUri()
+	{
+		if(isset($this->list_id)&&is_numeric($this->list_id)){
+			return str_replace('api/',$this->list_id.'/api/',$this->base_uri);
+		}
+		return $this->base_uri;
 	}
 
 	/**
