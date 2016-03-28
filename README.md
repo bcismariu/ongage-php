@@ -9,7 +9,7 @@ Update your `composer.json` file
 ```json
 {
     "require": {
-        "bcismariu/ongage-php": "0.*"
+        "bcismariu/ongage-php": "0.1.*"
     }
 }
 ```
@@ -20,13 +20,23 @@ Run `composer update`
 use Bcismariu\Ongage\Ongage;
 
 $ongage = new Ongage('USERNAME', 'PASSWORD', 'ACCOUNT_CODE');
-$ongage->useList('YOUR_LIST_ID')->addContact([
-    'email'  => 'contact.email@domain.com',
-    'name'   => 'First Contact'
+$ongage->contacts->add([
+    'list_id' => 'your_list_id',
+    'email'   => 'contact.email@domain.com',
+    'name'    => 'First Contact'
 ]);
+
+// set a default list id
+$ongage->setDefaultListId('your_list_id');
 ```
+The method naming attempts to map the api uri, as described in the [docs](http://apidocs.ongage.net/index.html).
+For instance, in order to make a call to `api/reports/query` the following method should be used:
+```php
+$ongage->reports->query($filter);
+```
+
 Read the official [API](https://ongage.atlassian.net/wiki/display/HELP/API) for more details regarding parameters and responses.
 
 ### Contributions
 
-This is a very basic implementation that can only handle email validations. Any project contributions are welcomed!
+This is a very basic implementation that can only handle contacts and reports. Any project contributions are welcomed!
