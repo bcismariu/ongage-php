@@ -74,14 +74,15 @@ class Ongage
 	}
 
 	/**
-	 * set current list id
+	 * sets a default list id that will be used as a route param as described here:
+	 * https://ongage.atlassian.net/wiki/display/HELP/API#API-HowtoIndicateListIDinOnageAPICalls
 	 * @param $list_id the list id
 	 * @return mixed
 	 */
-	public function useList($list_id)
+	public function setDefaultListId($list_id)
 	{
 		$this->list_id = $list_id;
-		return $this->list_id;
+		return $this;
 	}
 
 	/**
