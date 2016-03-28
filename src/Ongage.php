@@ -119,20 +119,20 @@ class Ongage
 	private function request($method, $url, $data)
 	{
 		return $this->client->request($method, $url, [
-				'base_uri'	=> $this->setUri(),
+				'base_uri'	=> $this->getBaseUri(),
 				'headers' 	=> $this->getAuthHeaders(),
 				'json'		=> $data
 			]);
 	}
 
 	/**
-	 * puts the list id in the request uri
+	 * builds the request base URI
 	 * @return string
 	 */
-	private function setUri()
+	private function getBaseUri()
 	{
-		if(isset($this->list_id)&&is_numeric($this->list_id)){
-			return str_replace('api/',$this->list_id.'/api/',$this->base_uri);
+		if(isset($this->list_id)){
+			return str_replace('api/', $this->list_id . '/api/' , $this->base_uri);
 		}
 		return $this->base_uri;
 	}
